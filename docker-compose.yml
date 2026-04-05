@@ -1,0 +1,20 @@
+services:
+  backend:
+    build: ./backend
+    environment:
+      DATA_DIR: /data
+      CACHE_DIR: /cache
+    volumes:
+      - ./data:/data:ro
+      - ./cache:/cache
+    expose:
+      - "8000"
+    ports:
+      - "8000:8000"
+
+  frontend:
+    build: ./frontend
+    depends_on:
+      - backend
+    ports:
+      - "8080:80"

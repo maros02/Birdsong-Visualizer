@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Birdsong Visualizer</title>
+    <style>
+      html, body { margin: 0; height: 100%; background: #07090d; color: #cfd6e4; font-family: system-ui, sans-serif; overflow: hidden; }
+      #canvas { position: fixed; inset: 0; }
+      #ui {
+        position: fixed; top: 12px; left: 12px; z-index: 10;
+        background: rgba(12, 16, 24, 0.78); padding: 12px 14px; border-radius: 8px;
+        backdrop-filter: blur(6px); font-size: 13px; max-width: 320px;
+      }
+      #ui h1 { font-size: 13px; margin: 0 0 8px; font-weight: 600; letter-spacing: 0.02em; }
+      #ui label { display: block; margin: 6px 0 2px; opacity: 0.7; font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; }
+      #ui select, #ui button { width: 100%; background: #1b2230; color: #cfd6e4; border: 1px solid #2a3446; padding: 6px 8px; border-radius: 4px; font: inherit; }
+      #ui button { cursor: pointer; margin-top: 6px; }
+      #ui button:hover { background: #243047; }
+      #ui .row { display: flex; gap: 6px; }
+      #ui .row > * { flex: 1; }
+      #status { margin-top: 8px; opacity: 0.6; font-size: 11px; min-height: 14px; }
+    </style>
+  </head>
+  <body>
+    <canvas id="canvas"></canvas>
+    <div id="ui">
+      <h1>Birdsong Visualizer</h1>
+      <label for="recording">Recording</label>
+      <select id="recording"></select>
+      <div class="row">
+        <button id="play">Play</button>
+        <button id="reset">Reset</button>
+      </div>
+      <label for="fade">Trail fade (s): <span id="fadeVal">4.0</span></label>
+      <input id="fade" type="range" min="0.5" max="20" step="0.5" value="4" style="width:100%" />
+      <div id="status"></div>
+    </div>
+    <script type="module" src="/src/main.ts"></script>
+</body>
+</html>
