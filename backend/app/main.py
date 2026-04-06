@@ -45,7 +45,9 @@ def _load_metadata() -> dict[str, dict]:
 def _find_audio(recording_id: str) -> Path | None:
     """Find audio file by stem (e.g. 'xc101371')."""
     for ext in AUDIO_EXTS:
-        candidate = SONGS_DIR / f"{recording_id}{ext}"
+        candidate = (SONGS_DIR / f"{recording_id}{ext}").resolve()
+        if candidate.parent != SONGS_DIR.resolve():
+            return None  # path traversal attempt
         if candidate.exists():
             return candidate
     return None
@@ -53,7 +55,7 @@ def _find_audio(recording_id: str) -> Path | None:
 
 @app.get("/api/health")
 def health() -> dict:
-    return {"status": "ok", "data_dir": str(DATA_DIR), "songs_exist": SONGS_DIR.exists()}
+    return {"status": "ok", "songs_exist": SONGS_DIR.exists()}
 
 
 @app.get("/api/recordings", response_model=RecordingList)
