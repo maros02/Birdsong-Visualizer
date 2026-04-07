@@ -15,7 +15,7 @@ Given a birdsong recording, the system:
 1. Splits the audio into short overlapping analysis windows (~46 ms @ 22.05 kHz).
 2. Extracts a rich per-frame feature vector (log-mel, MFCCs, spectral centroid / rolloff / bandwidth, RMS, spectral novelty).
 3. Projects the high-dimensional feature trajectory into **3D via UMAP**.
-4. Smooths the trajectory with an EMA filter.
+4. Smooths the trajectory with an EMA filter. Uses a Noise Gate.
 5. Streams the audio to the browser and animates a Three.js scene. Position, color, and accumulation are influenced by `audio.currentTime`.
 
 The backend computes a per-recording embedding on demand and caches it keyed by a content hash plus pipeline version. The frontend fetches the JSON, binds it to an `HTMLAudioElement`, and uses `currentTime` to drive every visualization on each animation frame.
@@ -112,9 +112,8 @@ Open **http://localhost:5173**. Vite proxies `/api` to the backend on port 8000.
 ## Dataset
 
 This project was built against the [British Birdsong Dataset](https://www.kaggle.com/datasets/rtatman/british-birdsong-dataset) (264 FLAC recordings, CC-licensed, sourced from xeno-canto). 
-Any corpus of short mono recordings will work. Drop audio files (`.flac`, `.wav`, `.mp3`, `.ogg`) into `data/songs/` and optionally provide a `data/birdsong_metadata.csv` with `file_id`, `genus`, `species`, `english_cname` columns to populate labels.
-
-(FYI) The `data/` directory is gitignored. Download it yourself! >:T
+Any corpus of short mono recordings will work. 
+Drop audio files (`.flac`, `.wav`, `.mp3`, `.ogg`) into `data/songs/` and optionally provide a `data/birdsong_metadata.csv` with `file_id`, `genus`, `species`, `english_cname` columns to populate labels.
 
 ---
 
@@ -155,8 +154,7 @@ Pipeline constants live in `backend/app/features.py`:
 | `N_MELS` | 40 | log-mel bins |
 | `N_MFCC` | 13 | mel-frequency cepstral coefficients |
 
-UMAP parameters (`n_neighbors=15`, `min_dist=0.1`) are in `backend/app/embedding.py`
-<br> EMA alpha defaults to `0.3` in `pipeline.py`.
+UMAP parameters are in `backend/app/embedding.py`
 
 ---
 
