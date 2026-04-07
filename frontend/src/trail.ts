@@ -11,6 +11,7 @@ export class TrailView {
   private embedding: Embedding | null = null;
   private lastIdx = -1;
   private fadeSeconds = 4.0;
+  private readonly rmsNoiseGate = 0.08; // RMS threshold to avoid jitter
 
   readonly group = new THREE.Group();
 
@@ -61,10 +62,22 @@ export class TrailView {
     if (idx > this.lastIdx) {
       for (let i = this.lastIdx + 1; i <= idx && i < maxFrames; i++) {
         const p = frames.xyz[i];
+        const rms = frames.rms[i];
         const c = i * 3;
-        this.positions[c] = p[0];
-        this.positions[c + 1] = p[1];
-        this.positions[c + 2] = p[2];
+
+        // noise gate: when RMS is low, blend with the previous position (smoothen it)
+        let x = p[0], y = p[1], z = p[2];
+        if (i > 0 && rms < this.rmsNoiseGate) {
+          const blend = rms / this.rmsNoiseGate;
+          const pc = (i - 1) * 3;
+          x = this.positions[pc]     + blend * (x - this.positions[pc]);
+          y = this.positions[pc + 1] + blend * (y - this.positions[pc + 1]);
+          z = this.positions[pc + 2] + blend * (z - this.positions[pc + 2]);
+        }
+
+        this.positions[c] = x;
+        this.positions[c + 1] = y;
+        this.positions[c + 2] = z;
 
         const centroid = frames.centroid[i];
         const color = new THREE.Color().setHSL(0.12 + (1 - centroid) * 0.38, 0.7, 0.55);
