@@ -10,7 +10,7 @@ export class TrailView {
   private readonly addedAt: Float32Array; // seconds (playback time) when each vertex was added
   private embedding: Embedding | null = null;
   private lastIdx = -1;
-  private fadeSeconds = 4.0;
+  private fadeSeconds = 1.0;
   private readonly rmsNoiseGate = 0.08; // RMS threshold to avoid jitter
 
   readonly group = new THREE.Group();

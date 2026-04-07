@@ -9,7 +9,7 @@ import umap
 def embed_3d(
     features: np.ndarray,
     n_neighbors: int = 15,
-    min_dist: float = 0.1,
+    min_dist: float = 0.7,
     random_state: int = 42,
 ) -> np.ndarray:
     """Fit a per-recording scaler + UMAP (in 3D) and return (T, 3) coords."""
