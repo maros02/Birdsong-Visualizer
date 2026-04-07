@@ -1,0 +1,12 @@
+.git
+.idea
+.vscode
+data
+cache
+**/node_modules
+**/dist
+**/__pycache__
+**/.venv
+**/venv
+*.md
+*.pdf

@@ -1,0 +1,29 @@
+# Datasets / audio
+data/
+cache/
+*.wav
+*.mp3
+*.flac
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+env/
+.ipynb_checkpoints/
+
+# Node / TypeScript
+node_modules/
+dist/
+build/
+*.log
+.env
+.env.local
+
+# IDE / OS
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
