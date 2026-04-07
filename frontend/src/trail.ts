@@ -1,7 +1,7 @@
 import * as THREE from "three";
 import type { Embedding } from "./api";
 
-/** Persistent continuous line through every frame played so far, fading by age. */
+/** Trail-view with fade mechanic. */
 export class TrailView {
   private readonly line: THREE.Line;
   private readonly positions: Float32Array;

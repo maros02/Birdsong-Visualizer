@@ -1,4 +1,4 @@
-"""3D embedding via StandardScaler + UMAP, plus temporal smoothing."""
+"""3D embedding via StandardScaler + UMAP + temporal smoothing."""
 from __future__ import annotations
 
 import numpy as np
@@ -19,18 +19,18 @@ def embed_3d(
     # cap nr of neighbors so short clips still fit.
     effective_nn = max(2, min(n_neighbors, scaled.shape[0] - 1))
 
-    reducer = umap.UMAP(
+    emb = umap.UMAP(
         n_components=3,
         n_neighbors=effective_nn,
         min_dist=min_dist,
         metric="euclidean",
         random_state=random_state,
     )
-    return reducer.fit_transform(scaled).astype(np.float32)
+    return emb.fit_transform(scaled).astype(np.float32)
 
 
 def ema_smooth(coords: np.ndarray, alpha: float = 0.3) -> np.ndarray:
-    """Exponential moving average along the time axis, seeded with coords[0]."""
+    """Exponential moving average (EMA) along the time axis, seeded with coords[0]."""
     smoothed = np.empty_like(coords)
     smoothed[0] = coords[0]
     for i in range(1, len(coords)):

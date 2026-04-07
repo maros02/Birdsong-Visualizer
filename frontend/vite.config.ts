@@ -1,6 +1,6 @@
 import { defineConfig } from "vite";
 
-// during `npm run dev`, proxy /api and /audio to the FastAPI backend
+
 export default defineConfig({
   server: {
     port: 5173,

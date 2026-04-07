@@ -48,5 +48,5 @@ def extract_features(y: np.ndarray, sr: int = SAMPLE_RATE) -> dict:
 
 
 def frame_times(n_frames: int, sr: int = SAMPLE_RATE, hop_length: int = HOP_LENGTH) -> np.ndarray:
-    """Return start time in seconds for each frame."""
+    """Return start time (s) per frame."""
     return (np.arange(n_frames) * hop_length / sr).astype(np.float32)

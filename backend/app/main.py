@@ -1,4 +1,4 @@
-"""FastAPI entrypoint for the Birdsong Visualizer backend."""
+"""FastAPI backend entrypoint."""
 from __future__ import annotations
 
 import csv
@@ -30,7 +30,7 @@ app.add_middleware(
 
 
 def _load_metadata() -> dict[str, dict]:
-    """Map file_id (e.g. '101371') to metadata row. Filenames look like xc101371.flac."""
+    """Map file_id (e.g. '101371') to metadata row (filenames look like xc101371.flac)."""
     if not METADATA_CSV.exists():
         return {}
     out: dict[str, dict] = {}
