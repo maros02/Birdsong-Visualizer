@@ -9,6 +9,7 @@ const btnPlay = document.getElementById("play") as HTMLButtonElement;
 const btnReset = document.getElementById("reset") as HTMLButtonElement;
 const fadeInput = document.getElementById("fade") as HTMLInputElement;
 const fadeVal = document.getElementById("fadeVal") as HTMLSpanElement;
+const autoRotateInput = document.getElementById("autoRotate") as HTMLInputElement;
 const statusEl = document.getElementById("status") as HTMLDivElement;
 
 const { renderer, scene, camera, controls } = createScene(canvas);
@@ -76,6 +77,10 @@ fadeInput.addEventListener("input", () => {
   trail.setFadeSeconds(s);
 });
 trail.setFadeSeconds(parseFloat(fadeInput.value));
+
+autoRotateInput.addEventListener("change", () => {
+  controls.autoRotate = autoRotateInput.checked;
+});
 
 btnPlay.addEventListener("click", () => {
   if (audio.paused) {

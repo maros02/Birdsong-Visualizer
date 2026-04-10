@@ -17,6 +17,8 @@
       #ui select, #ui button { width: 100%; background: #1b2230; color: #cfd6e4; border: 1px solid #2a3446; padding: 6px 8px; border-radius: 4px; font: inherit; }
       #ui button { cursor: pointer; margin-top: 6px; }
       #ui button:hover { background: #243047; }
+      #ui .checkbox-row { display: flex; align-items: center; gap: 6px; margin-top: 6px; }
+      #ui .checkbox-row input[type="checkbox"] { accent-color: #4a7dff; }
       #ui .row { display: flex; gap: 6px; }
       #ui .row > * { flex: 1; }
       #status { margin-top: 8px; opacity: 0.6; font-size: 11px; min-height: 14px; }
@@ -34,6 +36,10 @@
       </div>
       <label for="fade">Trail fade (s): <span id="fadeVal">1.0</span></label>
       <input id="fade" type="range" min="0.5" max="20" step="0.5" value="1" style="width:100%" />
+      <div class="checkbox-row">
+        <input id="autoRotate" type="checkbox" />
+        <label for="autoRotate" style="margin:0; text-transform:none; opacity:1; font-size:13px">Auto-rotate camera</label>
+      </div>
       <div id="status"></div>
     </div>
     <script type="module" src="/src/main.ts"></script>
