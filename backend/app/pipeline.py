@@ -1,4 +1,4 @@
-"""End-to-end pipeline: audio file → embedding JSON payload."""
+"""End-to-end pipeline: audio file to embedding JSON."""
 from __future__ import annotations
 
 import hashlib

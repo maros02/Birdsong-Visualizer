@@ -8,71 +8,28 @@ Much like musical visualizers, but for birdsongs!
 
 ---
 
-## What it does
+## What it does...
 
 Given a birdsong recording, the system:
 
-1. Splits the audio into short overlapping analysis windows (~46 ms @ 22.05 kHz).
-2. Extracts a rich per-frame feature vector (log-mel, MFCCs, spectral centroid / rolloff / bandwidth, RMS, spectral novelty).
-3. Projects the high-dimensional feature trajectory into **3D via UMAP**.
-4. Smooths the trajectory with an EMA filter. Uses a Noise Gate.
+1. Splits the audio into small (overlapping) windows (~46 ms @ 22.05 kHz).
+2. Measures the pitch center, energy, brightness, bandwidth, and how quickly the sound changes via a mel spectrogram and MFCCs. More specifically:
+   - log-mel
+   - MFCCs
+   - spectral centroid / rolloff / bandwidth
+   - RMS
+   - spectral novelty
+3. Projects the high-dimensional song trajectory into **3D via UMAP**.
+4. Smooths the trajectory with an EMA filter. Uses a Noise Gate to avoid jitter.
 5. Streams the audio to the browser and animates a Three.js scene. Position, color, and accumulation are influenced by `audio.currentTime`.
 
-The backend computes a per-recording embedding on demand and caches it keyed by a content hash plus pipeline version. The frontend fetches the JSON, binds it to an `HTMLAudioElement`, and uses `currentTime` to drive every visualization on each animation frame.
+The backend computes an embedding for each recording (on demand) and caches it keyed by a content hash plus pipeline version. The frontend fetches the JSON, binds it to an `HTMLAudioElement`, and uses `currentTime` to draw the visualization.
+
+The result is a 3D trajectory for every birdsong recording!
 
 ---
 
-## The trail!
-
-A spectral centroid drives hue from warm amber (low) to cool cyan (high); RMS drives size and brightness.
-
----
-
-## Tech stack
-
-| Layer | Tools |
-|---|---|
-| Audio analysis | Python, librosa, NumPy, scikit-learn, UMAP |
-| API | FastAPI, Uvicorn |
-| Frontend | TypeScript, Three.js, Vite |
-| Packaging | Docker, docker compose, nginx (static + reverse proxy) |
-
----
-
-## Repository layout
-
-```
-backend/
-  app/
-    main.py          FastAPI entrypoint + routes
-    pipeline.py      end-to-end audio → embedding payload, caching
-    features.py      librosa per-frame feature extraction
-    embedding.py     StandardScaler + UMAP(3D) + EMA smoothing
-    schemas.py       pydantic response models
-  scripts/
-    precompute.py    CLI for batch precomputing embeddings
-  requirements.txt
-  Dockerfile
-frontend/
-  src/
-    main.ts          bootstrap, UI wiring, RAF loop
-    scene.ts         renderer, camera, OrbitControls, fog, grid
-    api.ts           typed fetch clients
-    trail.ts         persistent line with age-based fade
-  index.html
-  vite.config.ts
-  Dockerfile         multi-stage: node build → nginx
-  nginx.conf
-data/                audio dataset (gitignored)
-  songs/*.flac
-  birdsong_metadata.csv
-cache/               precomputed embedding JSON (gitignored)
-docker-compose.yml
-```
-
----
-
-## Quick start
+## Running the Show
 
 ### With Docker (recommended)
 
@@ -89,8 +46,8 @@ Open **http://localhost:8080**. The backend mounts `./data` read-only and `./cac
 ```bash
 cd backend
 python -m venv .venv
-.venv\Scripts\activate          # Windows
-# source .venv/bin/activate     # macOS / Linux / WSL
+.venv\Scripts\activate # Windows
+# source .venv/bin/activate # macOS / Linux / WSL
 pip install -r requirements.txt
 uvicorn app.main:app --reload
 ```
@@ -109,9 +66,50 @@ Open **http://localhost:5173**. Vite proxies `/api` to the backend on port 8000.
 
 ---
 
+## Tech stack
+
+| Layer | Tools |
+|---|---|
+| Audio analysis | Python, librosa, NumPy, scikit-learn, UMAP |
+| API | FastAPI, Uvicorn |
+| Frontend | TypeScript, Three.js, Vite |
+| Packaging | Docker, docker compose, nginx |
+
+---
+
+## Project Structure
+
+### Backend
+- `app/`
+  - `embedding.py`: scaling, UMAP, and EMA smoothing functions
+  - `features.py`: feature extraction per frame
+  - `main.py`: FastAPI routes
+  - `pipeline.py`: audio -> embedding, caching
+  - `schemas.py`: pydantic response models
+- `scripts/precompute.py`: CLI for (batch) precomputing embeddings
+
+### Frontend
+
+- `src/`
+  - `api.ts`: fetch recordings/embeddings
+  - `main.ts`: main loop (eventlisteners)
+  - `scene.ts`: ThreeJS renderer, camera, OrbitControls, fog, grid
+  - `trail.ts`: 3D visualized trail (with time based fade)
+- `index.html`
+- `vite.config.ts`
+- `Dockerfile`: node build -> nginx
+- `nginx.conf`
+- `data/`: audio dataset
+  - `songs/*.flac`
+  - `birdsong_metadata.csv`
+- `docker-compose.yml`
+- `cache/`: local directory for precomputed embeddings
+
+---
+
 ## Dataset
 
-This project was built against the [British Birdsong Dataset](https://www.kaggle.com/datasets/rtatman/british-birdsong-dataset) (264 FLAC recordings, CC-licensed, sourced from xeno-canto). 
+This project was built with the [British Birdsong Dataset](https://www.kaggle.com/datasets/rtatman/british-birdsong-dataset) (264 FLAC recordings, CC-licensed, sourced from xeno-canto). 
 Any corpus of short mono recordings will work. 
 Drop audio files (`.flac`, `.wav`, `.mp3`, `.ogg`) into `data/songs/` and optionally provide a `data/birdsong_metadata.csv` with `file_id`, `genus`, `species`, `english_cname` columns to populate labels.
 
@@ -133,18 +131,18 @@ Cache files are keyed by `{stem}_{sha256[:16]}_v{pipeline_version}.json`, so re-
 
 ## API
 
-| Method | Path | Description |
-|---|---|---|
-| `GET` | `/api/health` | liveness + data-dir sanity check |
-| `GET` | `/api/recordings` | list recordings with metadata joined from CSV |
-| `GET` | `/api/embedding/{id}` | return cached JSON (computes on miss) |
+| Method | Path | Description                                      |
+|---|---|--------------------------------------------------|
+| `GET` | `/api/health` | wellness check                                   |
+| `GET` | `/api/recordings` | list recordings with metadata joined from CSV    |
+| `GET` | `/api/embedding/{id}` | return cached JSON (computes on miss)            |
 | `GET` | `/api/audio/{id}` | stream the raw audio file for `<audio>` playback |
 
 ---
 
 ## Configuration
 
-Pipeline constants live in `backend/app/features.py`:
+Pipeline parameters in `backend/app/features.py`:
 
 | Constant | Default | Notes |
 |---|---|---|
@@ -163,7 +161,6 @@ UMAP parameters are in `backend/app/embedding.py`
 - Add an architecture diagram (currently only sketched out on paper...)
 - Fix some minor bugs (visual artifacts)
 - Experiment with new features (fancier shaders!)
-- Adjust filters to avoid non-bird noise (e.g. background noise)
 
 ---
 

@@ -1,4 +1,4 @@
-"""FastAPI backend entrypoint."""
+"""FastAPI backend."""
 from __future__ import annotations
 
 import csv
@@ -62,12 +62,16 @@ def health() -> dict:
 def list_recordings() -> RecordingList:
     if not SONGS_DIR.exists():
         raise HTTPException(404, f"songs directory not found: {SONGS_DIR}")
+
+    # fetch metadata
     meta = _load_metadata()
     items: list[Recording] = []
+
+    # iterate through song list
     for p in sorted(SONGS_DIR.iterdir()):
         if p.suffix.lower() not in AUDIO_EXTS:
             continue
-        stem = p.stem  # e.g. xc101371
+        stem = p.stem # e.g. xc101371
         # strip leading non-digits to match csv file_id
         fid = "".join(ch for ch in stem if ch.isdigit())
         row = meta.get(fid, {})
