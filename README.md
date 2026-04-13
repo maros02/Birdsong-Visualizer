@@ -6,6 +6,8 @@ A proof-of-concept tool that transforms birdsong into a 3D mapped visualization.
 
 Much like musical visualizers, but for birdsongs!
 
+https://github.com/user-attachments/assets/58e34d64-60c1-4898-84c3-a138ef75a2bc
+
 ---
 
 ## What it does...
